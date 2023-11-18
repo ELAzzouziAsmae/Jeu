@@ -1,5 +1,5 @@
 #include "Game.h"
-
+#include "Start.h"
 void Game::initwindow()
 {
     this->window = new sf::RenderWindow(sf::VideoMode(800, 600), "game 3", sf::Style::Close | sf::Style::Titlebar);
@@ -44,10 +44,15 @@ void Game::initEnemies()
 void Game::initSystems()
 {
     this->points = 0;
+    if (!pistolSoundBuffer.loadFromFile("sound/tir.wav")) {
+        std::cerr << "Failed to load pistol sound!" << std::endl;
+    }
+    pistolSound.setBuffer(pistolSoundBuffer);
 }
 
 Game::Game()
 {
+    soundManager.playBackgroundMusic();
     this->initwindow();
     this->initTextures();
     this->initPlayer();
@@ -130,17 +135,15 @@ void Game::updateInput()
 
     }
 
-}
-
-void Game::updateColusion()
+}void Game::updateColusion()
 {
     if (this->player->getBounds().left < 0.f)
     {
         this->player->setPosition(0.f, this->player->getBounds().top);
     }
-    if (this->player->getBounds().top < 100.f)
+    if (this->player->getBounds().top < 0.f)
     {
-        this->player->setPosition(this->player->getBounds().left, 100.f);
+        this->player->setPosition(this->player->getBounds().left, 0.f);
     }
     if (this->player->getBounds().left > this->window->getSize().x - 100.f)
     {
@@ -151,6 +154,7 @@ void Game::updateColusion()
         this->player->setPosition(this->player->getBounds().left, this->window->getSize().y - 100.f);
     }
 }
+
 
 
 void Game::updateBullets()
@@ -183,6 +187,21 @@ void Game::updateBullets()
 
 
 }
+
+void Game::updateGUI()
+{
+    std::stringstream ss;
+    ss << "Points: " << this->points;
+
+    this->poitText.setString(ss.str());
+    float hpPercent = static_cast<float>(this->player->getHp()) / this->player->getHpMax();
+    this->playerHpBar.setSize(sf::Vector2f(300.f * hpPercent, this->playerHpBar.getSize().y));
+
+
+
+}
+
+
 void Game::renderGUI()
 {
     std::pair<sf::Text, sf::Text> textPair = this->gui1->render();
@@ -279,8 +298,9 @@ void Game::update()
 
     this->updateColusion();
     this->updateBullets();
-
+    this->updateEnemies();
     this->updateCombat();
+    this->updateGUI();
     this->updateWorld();
 
     this->generateBonus(); 
@@ -322,7 +342,7 @@ void Game::render()
     this->renderGUI();
     if (this->player->getHp() <= 0)
         this->window->draw(this->gui2->render());
-
+    this->window->display();
 }
 
 
@@ -347,6 +367,12 @@ void Game::generateBonus()
         bonusTimer = 0; // Reset the bonus timer
     }
 }
+
+
+void Game::updateWorld()
+{
+}
+
 
 void Game::updateBonus()
 {

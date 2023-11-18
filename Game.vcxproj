@@ -27,6 +27,8 @@
     <ClInclude Include="guiplayerHpBar.h" />
     <ClInclude Include="guiPlayerPoints.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bonus.cpp" />
@@ -37,6 +39,8 @@
     <ClCompile Include="guiplayerHpBar.cpp" />
     <ClCompile Include="guiPlayerPoints.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="Start.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

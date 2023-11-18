@@ -8,6 +8,9 @@
 #include "GameOver.h"
 #include "guiplayerHpBar.h"
 #include "Bonus.h"
+#include "SoundManager.h"
+#include <SFML/Audio.hpp>
+
 #include<map>
 
 class Game
@@ -17,10 +20,14 @@ private:
     sf::RenderWindow* window;
     std::map<std::string, sf::Texture*> textures;
     std::vector<Bullet*> bullets;
-
+    sf::Font font;
+    sf::Text poitText;
     sf::Texture worldBackgroundText;
     sf::Sprite worldBackground;
     unsigned points;
+    SoundManager soundManager;
+    sf::Sound pistolSound;
+    sf::SoundBuffer pistolSoundBuffer;
     Player* player;
     std::vector<Bonus*> bonuses;
     sf::Texture bonusTexture;
@@ -55,9 +62,10 @@ public:
     void run();
     void updatePollEvents();
     void updateInput();
+    void updateWorld();
     void updateColusion();
     void updateBullets();
-
+    void updateGUI();
  
     void renderGUI();
     void renderWorld();
