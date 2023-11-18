@@ -7,12 +7,11 @@ void Game::initwindow()
     this->window->setVerticalSyncEnabled(false);
 }
 
-
-
-
-
-
-
+void Game::initTextures()
+{
+    this->textures["BULLET"] = new sf::Texture();
+    this->textures["BULLET"]->loadFromFile("Textures/bullet.png");
+}
 void Game::initPlayer()
 {
     this->player = new Player();
@@ -51,7 +50,7 @@ Game::Game()
 {
     this->initwindow();
    
-
+    this->initTextures();
     this->initPlayer();
     this->initGUID();
     this->initEnemies();
@@ -66,6 +65,15 @@ Game::~Game()
 {
     delete this->player;
     delete this->window;
+    for (auto& i : this->textures)
+    {
+        delete i.second;
+
+    }
+    for (auto* i : this->bullets)
+    {
+        delete i;
+    }
     for (auto* i : this->enemies)
     {
         delete i;
@@ -119,6 +127,8 @@ void Game::updateInput()
         this->player->move(0.f, -1.f);
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         this->player->move(0.f, 1.f);
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->player->canAttack()) {
+        this->bullets.push_back(new Bullet(this->textures["BULLET"], this->player->getPos().x + this->player->getBounds().width / 2.f, this->player->getPos().y, 0.f, -1.f, 5.f));
 
 }
 
@@ -146,6 +156,31 @@ void Game::updateColusion()
     }
 }
 
+void Game::updateBullets()
+{
+    // Create a new vector to store bullets to be removed
+    std::vector<Bullet*> bulletsToRemove;
+
+    for (auto* bullet : this->bullets)
+    {
+        bullet->update();
+        if (bullet->getBounds().top + bullet->getBounds().height < 0.f)
+        {
+            // Instead of deleting and erasing in the loop, mark for removal
+            bulletsToRemove.push_back(bullet);
+        }
+    }
+
+    // Remove the marked bullets from the original vector
+    for (auto* bullet : bulletsToRemove)
+    {
+        auto it = std::find(this->bullets.begin(), this->bullets.end(), bullet);
+        if (it != this->bullets.end())
+        {
+            this->bullets.erase(it);
+            delete bullet; // Delete the removed bullet
+        }
+    
 
 
 
@@ -212,7 +247,29 @@ void Game::updateEnemies()
 
 }
 
+void Game::updateCombat()
+{
+    for (int i = 0; i < this->enemies.size(); i++) {
+        for (size_t k = 0; k < this->bullets.size(); k++) {
+            if (this->enemies[i]->getBounds().intersects(this->bullets[k]->getBounds())) {
+                this->points += this->enemies[i]->getPoints();
+                // Mark the enemy and bullet for deletion
+                delete this->enemies[i];
+                delete this->bullets[k];
 
+                // Remove the marked enemy and bullet
+                this->enemies.erase(this->enemies.begin() + i);
+                this->bullets.erase(this->bullets.begin() + k);
+
+                // Decrement i and k to recheck the current index
+                i--;
+                k--;
+                break; // Exit the inner loop since the bullet can only hit one enemy
+            }
+        }
+    }
+
+}
 
 
 void Game::update()
@@ -222,7 +279,8 @@ void Game::update()
     this->player->update();
 
     this->updateColusion();
- 
+    this->updateBullets();
+
     this->updateCombat();
     this->updateWorld();
 
@@ -239,7 +297,11 @@ void Game::render()
     this->window->clear();
     this->renderWorld();
     this->player->render(*this->window);
-   
+    for (auto* bullet : this->bullets)
+    {
+        bullet->render(*this->window);
+
+    }
 
     this->renderGUI();
     if (this->player->getHp() <= 0)
