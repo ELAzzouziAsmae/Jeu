@@ -49,15 +49,13 @@ void Game::initSystems()
 Game::Game()
 {
     this->initwindow();
-   
     this->initTextures();
     this->initPlayer();
     this->initGUID();
     this->initEnemies();
     this->initWord();
     this->initSystems();
-    
-
+    this->initBonus();
 
 }
 
@@ -119,21 +117,19 @@ void Game::updatePollEvents()
 void Game::updateInput()
 {
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         this->player->move(-1.f, 0.f);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         this->player->move(1.f, 0.f);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
         this->player->move(0.f, -1.f);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         this->player->move(0.f, 1.f);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->player->canAttack()) {
         this->bullets.push_back(new Bullet(this->textures["BULLET"], this->player->getPos().x + this->player->getBounds().width / 2.f, this->player->getPos().y, 0.f, -1.f, 5.f));
 
-}
+    }
 
-void Game::updateWorld()
-{
 }
 
 void Game::updateColusion()
@@ -155,6 +151,7 @@ void Game::updateColusion()
         this->player->setPosition(this->player->getBounds().left, this->window->getSize().y - 100.f);
     }
 }
+
 
 void Game::updateBullets()
 {
@@ -180,10 +177,12 @@ void Game::updateBullets()
             this->bullets.erase(it);
             delete bullet; // Delete the removed bullet
         }
-    
+    }
 
 
 
+
+}
 void Game::renderGUI()
 {
     std::pair<sf::Text, sf::Text> textPair = this->gui1->render();
@@ -284,6 +283,13 @@ void Game::update()
     this->updateCombat();
     this->updateWorld();
 
+    this->generateBonus(); 
+    this->updateBonus();   
+
+
+    this->handleBonusCollision();
+    this->gui1->UpdateinitguiPlayerPoints(this->points);
+    this->gui3->updateguiplayerHpBar(this->player->getHp(), this->player->getHpMax());
 
 
 
@@ -297,45 +303,11 @@ void Game::render()
     this->window->clear();
     this->renderWorld();
     this->player->render(*this->window);
-    for (auto* bullet : this->bullets)
+    for (auto* bonus : bonuses)
     {
-        bullet->render(*this->window);
+        this->window->draw(*bonus);
 
     }
-
-    this->renderGUI();
-    if (this->player->getHp() <= 0)
-        this->window->draw(this->gui2->render());
-
-}
-
-
-
-
-
-
-void Game::update()
-{
-
-    this->updateInput();
-   
-    this->updateColusion();
-    
-    this->updateEnemies();
-    this->updateCombat();
-    this->updateGUI();
-    this->updateWorld();
-
-
-}
-
-void Game::render()
-{
-
-    this->window->clear();
-    this->renderWorld();
-
-    this->player->render(*this->window);
     for (auto* bullet : this->bullets)
     {
         bullet->render(*this->window);
@@ -346,9 +318,79 @@ void Game::render()
         enemy->render(this->window);
 
     }
+
     this->renderGUI();
     if (this->player->getHp() <= 0)
-        this->window->draw(this->gameOverText);
-    this->window->display();
+        this->window->draw(this->gui2->render());
 
 }
+
+
+void Game::initBonus()
+{
+    if (!bonusTexture.loadFromFile("Textures/cup.png"))
+    {
+        std::cout << "Error: Failed to load bonus texture" << std::endl;
+    }
+    bonusFrequency = 500; // Adjust as needed based on enemy speed
+    bonusTimer = 0;
+}
+
+void Game::generateBonus()
+{
+    if (player->getHp() < player->getHpMax() && bonusTimer >= bonusFrequency)
+    {
+        float x = static_cast<float>(rand() % (window->getSize().x - 30)); // Adjust as needed
+        float y = static_cast<float>(-30); // Start above the screen
+        Bonus* newBonus = new Bonus(x, y, bonusTexture);
+        bonuses.push_back(newBonus);
+        bonusTimer = 0; // Reset the bonus timer
+    }
+}
+
+void Game::updateBonus()
+{
+    bonusTimer++;
+    // Update all existing bonuses
+    for (auto it = bonuses.begin(); it != bonuses.end();)
+    {
+        Bonus* bonus = *it;
+        bonus->move(0, 2.0f); // Move the bonus down, adjust the speed as needed
+        if (bonus->getPosition().y > window->getSize().y)
+        {
+            // Remove the bonus if it's below the screen
+            delete bonus;
+            it = bonuses.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+}
+
+void Game::handleBonusCollision()
+{
+    // Iterate through the bonuses to check for collisions with the player
+    for (auto it = bonuses.begin(); it != bonuses.end();)
+    {
+        Bonus* bonus = *it;
+        if (bonus->isTouched(player->getBounds()))
+        {
+            // Apply the bonus effect (e.g., increase player's HP)
+            this->player->setHp(this->player->getHp() + 10);
+            delete bonus;
+            it = bonuses.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
+}
+
+
+
+
+
+

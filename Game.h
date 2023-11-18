@@ -4,6 +4,10 @@
 #include <sstream>
 #include "Bullet.h"
 #include "Enemy.h"
+#include "guiPlayerPoints.h"
+#include "GameOver.h"
+#include "guiplayerHpBar.h"
+#include "Bonus.h"
 #include<map>
 
 class Game
@@ -18,7 +22,15 @@ private:
     sf::Sprite worldBackground;
     unsigned points;
     Player* player;
+    std::vector<Bonus*> bonuses;
     sf::Texture bonusTexture;
+    int bonusFrequency; // Adjust this value based on enemy speed
+    int bonusTimer; // Keep track of time to determine when to spawn bonuses
+
+    guiPlayerPoints* gui1;
+    GameOver* gui2;
+    guiplayerHpBar* gui3;
+
 
 
     float spawnTimer;
@@ -33,12 +45,9 @@ private:
     void initTextures();
     void initPlayer();
     void initGUID();
-
-    void initSystems();
-
-
     void initWord();
     void initEnemies();
+    void initSystems();
 
 public:
     Game();
@@ -46,7 +55,6 @@ public:
     void run();
     void updatePollEvents();
     void updateInput();
-    void updateWorld();
     void updateColusion();
     void updateBullets();
 
@@ -58,6 +66,10 @@ public:
 
     void update();
     void render();
+    void initBonus();
+    void updateBonus();
+    void handleBonusCollision();
+    void generateBonus();
 
 };
 
