@@ -52,6 +52,9 @@ void Game::initSystems()
 
 Game::Game()
 {
+    this->gui1 = new guiPlayerPoints();
+    this->gui2 = new GameOver();
+    this->gui3 = new guiplayerHpBar();
     soundManager.playBackgroundMusic();
     this->initwindow();
     this->initTextures();
@@ -188,20 +191,6 @@ void Game::updateBullets()
 
 }
 
-void Game::updateGUI()
-{
-    std::stringstream ss;
-    ss << "Points: " << this->points;
-
-    this->poitText.setString(ss.str());
-    float hpPercent = static_cast<float>(this->player->getHp()) / this->player->getHpMax();
-    this->playerHpBar.setSize(sf::Vector2f(300.f * hpPercent, this->playerHpBar.getSize().y));
-
-
-
-}
-
-
 void Game::renderGUI()
 {
     std::pair<sf::Text, sf::Text> textPair = this->gui1->render();
@@ -220,6 +209,7 @@ void Game::renderGUI()
 }
 
 
+
 void Game::renderWorld()
 {
     this->window->draw(this->worldBackground);
@@ -227,14 +217,14 @@ void Game::renderWorld()
 
 
 void Game::updateEnemies()
-{///////////////////////////////////////////
-    this->spawnTimer += 0.3f;
+{
+    float enemySpeed = 0.5f + (static_cast<float>(this->points) * 0.005f);
+
+    this->spawnTimer += enemySpeed; // Use the adjusted enemySpeed
     if (this->spawnTimer >= this->spawnTimerMax)
     {
-        this->enemies.push_back(new Enemy(rand() % this->window->getSize().x - 20.f, -100.f));
+        this->enemies.push_back(new Enemy(rand() % this->window->getSize().x - 20.f, -100.f, enemySpeed));
         this->spawnTimer = 0.f;
-
-
     }
 
 
@@ -258,10 +248,6 @@ void Game::updateEnemies()
         }
         ++counter;
     }
-
-
-
-
 
 }
 
@@ -288,6 +274,29 @@ void Game::updateCombat()
     }
 
 }
+void Game::updateCombat()
+{
+    for (int i = 0; i < this->enemies.size(); i++) {
+        for (size_t k = 0; k < this->bullets.size(); k++) {
+            if (this->enemies[i]->getBounds().intersects(this->bullets[k]->getBounds())) {
+                this->points += this->enemies[i]->getPoints();
+                                // Mark the enemy and bullet for deletion
+                delete this->enemies[i];
+                delete this->bullets[k];
+
+                // Remove the marked enemy and bullet
+                this->enemies.erase(this->enemies.begin() + i);
+                this->bullets.erase(this->bullets.begin() + k);
+
+                // Decrement i and k to recheck the current index
+                i--;
+                k--;
+                break; // Exit the inner loop since the bullet can only hit one enemy
+            }
+        }
+    }
+}
+
 
 
 void Game::update()
@@ -300,7 +309,6 @@ void Game::update()
     this->updateBullets();
     this->updateEnemies();
     this->updateCombat();
-    this->updateGUI();
     this->updateWorld();
 
     this->generateBonus(); 

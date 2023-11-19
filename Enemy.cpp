@@ -24,11 +24,12 @@ void Enemy::initShape()
 
 }
 
-Enemy::Enemy(float pos_x, float pos_y)
+Enemy::Enemy(float pos_x, float pos_y, float speed)
 {
     this->initVariables();
     this->initShape();
     this->shape.setPosition(pos_x, pos_y);
+    this->speed = speed;
 
 }
 

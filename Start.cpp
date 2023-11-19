@@ -38,7 +38,11 @@ void Start::handleEvents()
         {
             if (e.mouseButton.button == sf::Mouse::Left)
             {
-                if (this->startText.getGlobalBounds().contains(sf::Vector2f(e.mouseButton.x, e.mouseButton.y)))
+                // Explicitly cast to float to avoid the C4244 warning
+                float mouseX = static_cast<float>(e.mouseButton.x);
+                float mouseY = static_cast<float>(e.mouseButton.y);
+
+                if (this->startText.getGlobalBounds().contains(sf::Vector2f(mouseX, mouseY)))
                 {
                     this->gameStarted = true;
                 }
@@ -46,6 +50,7 @@ void Start::handleEvents()
         }
     }
 }
+
 
 void Start::update()
 {

@@ -2,6 +2,8 @@
 
 guiPlayerPoints::guiPlayerPoints()
 {
+    this->initguiPlayerPoints();
+
 }
 
 guiPlayerPoints::~guiPlayerPoints()
@@ -10,7 +12,6 @@ guiPlayerPoints::~guiPlayerPoints()
 
 void guiPlayerPoints::initguiPlayerPoints()
 {
-
     if (!this->font.loadFromFile("Fonts/ARCADECLASSIC.TTF"))
         std::cout << "error loaded font";
     this->poitText1.setFont(this->font);

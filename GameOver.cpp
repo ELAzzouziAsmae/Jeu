@@ -3,6 +3,7 @@
 
 GameOver::GameOver()
 {
+   
 }
 
 GameOver::~GameOver()

@@ -17,7 +17,7 @@ private:
     void initShape();
 
 public:
-    Enemy(float pos_x, float pos_y);
+    Enemy(float pos_x, float pos_y, float speed);
     virtual ~Enemy();
     const sf::FloatRect getBounds() const;
     const int& getPoints() const;

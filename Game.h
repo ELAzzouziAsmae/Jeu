@@ -28,6 +28,8 @@ private:
     SoundManager soundManager;
     sf::Sound pistolSound;
     sf::SoundBuffer pistolSoundBuffer;
+
+ 
     Player* player;
     std::vector<Bonus*> bonuses;
     sf::Texture bonusTexture;
@@ -40,8 +42,6 @@ private:
 
 
 
-    float spawnTimer;
-    float spawnTimerMax;
     std::vector<Enemy*> enemies;
    
 
@@ -65,7 +65,6 @@ public:
     void updateWorld();
     void updateColusion();
     void updateBullets();
-    void updateGUI();
  
     void renderGUI();
     void renderWorld();
