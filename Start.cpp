@@ -19,7 +19,7 @@ Start::Start(sf::RenderWindow* window)
 }
 
 Start::~Start()
-{
+{//
 }
 
 bool Start::isGameStarted() const
