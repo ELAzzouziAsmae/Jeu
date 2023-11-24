@@ -26,6 +26,7 @@
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="guiplayerHpBar.h" />
     <ClInclude Include="guiPlayerPoints.h" />
+    <ClInclude Include="LineEnemy.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Start.h" />
@@ -38,6 +39,7 @@
     <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="guiplayerHpBar.cpp" />
     <ClCompile Include="guiPlayerPoints.cpp" />
+    <ClCompile Include="LineEnemy.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SoundManager.cpp" />

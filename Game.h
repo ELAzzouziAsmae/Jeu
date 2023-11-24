@@ -8,6 +8,7 @@
 #include "GameOver.h"
 #include "guiplayerHpBar.h"
 #include "Bonus.h"
+#include "LineEnemy.h"
 #include "SoundManager.h"
 #include <SFML/Audio.hpp>
 
@@ -29,6 +30,8 @@ private:
     sf::Sound pistolSound;
     sf::SoundBuffer pistolSoundBuffer;
 
+    unsigned maxPoints;  // Variable pour le nombre maximal de points possibles
+    std::vector<LineEnemy*> lineEnemies;
  
     Player* player;
     std::vector<Bonus*> bonuses;
