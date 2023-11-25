@@ -50,6 +50,8 @@ void Game::initSystems()
         std::cerr << "Failed to load pistol sound!" << std::endl;
     }
     pistolSound.setBuffer(pistolSoundBuffer);
+    
+
 }
 
 Game::Game()
@@ -127,17 +129,17 @@ void Game::updatePollEvents()
 void Game::updateInput()
 {
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         this->player->move(-1.f, 0.f);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         this->player->move(1.f, 0.f);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         this->player->move(0.f, -1.f);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         this->player->move(0.f, 1.f);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->player->canAttack()) {
         this->bullets.push_back(new Bullet(this->textures["BULLET"], this->player->getPos().x + this->player->getBounds().width / 2.f, this->player->getPos().y, 0.f, -1.f, 5.f));
-
+        pistolSound.play();
     }
 
 }void Game::updateColusion()
