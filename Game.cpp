@@ -103,7 +103,9 @@ void Game::run()
     while (this->window->isOpen())
     {
         this->updatePollEvents();
-        if (this->player->getHp() > 0)
+       //
+        if (!this->gameManager.isPaused() && this->player->getHp() > 0)
+        //
             this->update();
 
         this->render();
@@ -119,6 +121,12 @@ void Game::updatePollEvents()
             this->window->close();
         if (e.Event::KeyPressed && e.Event::key.code == sf::Keyboard::Escape)
             this->window->close();
+        //
+        if (e.type == sf::Event::KeyPressed && e.key.code == sf::Keyboard::Space)
+        {
+            this->gameManager.togglePause();
+        }
+        //
 
     }
 }
@@ -128,6 +136,12 @@ void Game::updatePollEvents()
 
 void Game::updateInput()
 {
+    //
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+    {
+        this->gameManager.togglePause();
+    }
+    //
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         this->player->move(-1.f, 0.f);

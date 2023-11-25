@@ -11,6 +11,7 @@
 #include "LineEnemy.h"
 #include "SoundManager.h"
 #include <SFML/Audio.hpp>
+#include "GameManager.h"
 
 #include<map>
 
@@ -46,7 +47,9 @@ private:
 
 
     std::vector<Enemy*> enemies;
-   
+    //
+    GameManager gameManager;
+    //
 
 
     float spawnTimer;

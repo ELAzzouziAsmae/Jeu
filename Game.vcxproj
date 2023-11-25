@@ -23,6 +23,7 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="guiplayerHpBar.h" />
     <ClInclude Include="guiPlayerPoints.h" />
@@ -36,6 +37,7 @@
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="guiplayerHpBar.cpp" />
     <ClCompile Include="guiPlayerPoints.cpp" />
