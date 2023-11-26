@@ -12,7 +12,7 @@ guiPlayerPoints::~guiPlayerPoints()
 
 void guiPlayerPoints::initguiPlayerPoints()
 {
-    if (!this->font.loadFromFile("Fonts/ARCADECLASSIC.TTF"))
+    if (!this->font.loadFromFile("Fonts/Dosis-VariableFont_wght.TTF"))
         std::cout << "error loaded font";
     this->poitText1.setFont(this->font);
     this->poitText1.setCharacterSize(20);
@@ -24,21 +24,28 @@ void guiPlayerPoints::initguiPlayerPoints()
     this->poitText2.setFont(this->font);
     this->poitText2.setCharacterSize(25);
     this->poitText2.setFillColor(sf::Color::Red);
-    sf::Vector2f position1(760.0f, 7.0f);
+    sf::Vector2f position1(660.0f, 32.0f);
     this->poitText2.setPosition(position1);
+
 }
 
 
 
-void guiPlayerPoints::UpdateinitguiPlayerPoints(unsigned points)
-{
-    std::stringstream ss;
-    ss << points;
-    this->poitText2.setString(ss.str());
+void guiPlayerPoints::UpdateinitguiPlayerPoints(unsigned points, float totalElapsedTime) {
+    std::ostringstream ss;
+    ss << "Points: " << points;
+    poitText1.setString(ss.str());
+
+    int minutes = static_cast<int>(totalElapsedTime) / 60;
+    int seconds = static_cast<int>(totalElapsedTime) % 60;
+
+    std::ostringstream timeSS;
+    timeSS << "Time: " << minutes << "m " << seconds << "s";
+    poitText2.setString(timeSS.str());
+    std::cout << "Elapsed Time in GUI: " << totalElapsedTime << std::endl;
 }
 
-std::pair<sf::Text, sf::Text> guiPlayerPoints::render()
-{
-    return std::make_pair(this->poitText1, this->poitText2);
-}
+std::pair<sf::Text, sf::Text> guiPlayerPoints::render() const {
 
+    return std::make_pair(poitText1, poitText2);
+}

@@ -16,7 +16,8 @@ public:
     guiPlayerPoints();
     virtual ~guiPlayerPoints();
     void initguiPlayerPoints();
-    void UpdateinitguiPlayerPoints(unsigned points);
-    std::pair<sf::Text, sf::Text> render();
+    void UpdateinitguiPlayerPoints(unsigned points, float totalElapsedTime);
+
+    std::pair<sf::Text, sf::Text> render() const;
 };
 

@@ -30,10 +30,14 @@ private:
     SoundManager soundManager;
     sf::Sound pistolSound;
     sf::SoundBuffer pistolSoundBuffer;
-
+    float lineSpawnTimerMax;
+    float lineSpawnTimer;
     unsigned maxPoints;  // Variable pour le nombre maximal de points possibles
     std::vector<LineEnemy*> lineEnemies;
  
+    sf::Clock clock;
+    float totalElapsedTime = 0.0f;
+
     Player* player;
     std::vector<Bonus*> bonuses;
     sf::Texture bonusTexture;

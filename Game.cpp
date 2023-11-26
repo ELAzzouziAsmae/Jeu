@@ -15,6 +15,7 @@ void Game::initTextures()
 void Game::initPlayer()
 {
     this->player = new Player();
+    this->player->setMovementSpeed(3.0f);
 }
 
 void Game::initGUID()
@@ -38,6 +39,8 @@ void Game::initEnemies()
 {
     this->spawnTimerMax = 50.f;
     this->spawnTimer = this->spawnTimerMax;
+    this->lineSpawnTimerMax = 200.f;
+    this->lineSpawnTimer = this->lineSpawnTimerMax;
     // Ajoutez les LineEnemy
     this->lineEnemies.push_back(new LineEnemy(rand() % this->window->getSize().x - 20.f,-100.f,sf::Color::Blue,3.f, 1.f ));
 }
@@ -56,6 +59,8 @@ void Game::initSystems()
 
 Game::Game()
 {
+    this->lineSpawnTimerMax = 200.f;
+    this->lineSpawnTimer = 0.f;
     this->gui1 = new guiPlayerPoints();
     this->gui2 = new GameOver();
     this->gui3 = new guiplayerHpBar();
@@ -176,8 +181,6 @@ void Game::updateInput()
     }
 }
 
-
-
 void Game::updateBullets()
 {
     // Create a new vector to store bullets to be removed
@@ -204,55 +207,19 @@ void Game::updateBullets()
         }
     }
 
-    // Collision entre les balles et les LineEnemy
-    std::vector<LineEnemy*> lineEnemiesToRemove;
-
+    // Collision between bullets and LineEnemy
     for (auto* lineEnemy : this->lineEnemies)
     {
         for (auto* bullet : this->bullets)
         {
             if (lineEnemy->getBounds().intersects(bullet->getBounds()))
             {
-                // Le joueur a touché le LineEnemy avec une balle, ajoutez des points
-                this->player->gainPoints(1);
-
-                // Marquez le LineEnemy pour suppression
-                lineEnemiesToRemove.push_back(lineEnemy);
+                // You may add any effects you want when a bullet hits LineEnemy, but no points or deletion
             }
         }
-
-        // Collision entre le joueur et le LineEnemy
-        if (lineEnemy->getBounds().intersects(this->player->getBounds()))
-        {
-            // Le joueur a atteint le LineEnemy, ajoutez des points à la barre de points
-            int currentHp = this->player->getHp();
-            this->player->setHp(currentHp + 1);
-
-            // Supprimez le LineEnemy
-            auto it = std::find(this->lineEnemies.begin(), this->lineEnemies.end(), lineEnemy);
-            if (it != this->lineEnemies.end())
-            {
-                this->lineEnemies.erase(it);
-                delete lineEnemy;
-            }
-        }
-
     }
-
-    // Supprimez les LineEnemy marqués pour suppression
-    for (auto* lineEnemy : lineEnemiesToRemove)
-    {
-        auto it = std::find(this->lineEnemies.begin(), this->lineEnemies.end(), lineEnemy);
-        if (it != this->lineEnemies.end())
-        {
-            this->lineEnemies.erase(it);
-            delete lineEnemy;
-        }
-    }
-
-
-
 }
+
 
 void Game::renderGUI()
 {
@@ -278,20 +245,29 @@ void Game::renderWorld()
     this->window->draw(this->worldBackground);
    
 }
-
-
 void Game::updateEnemies()
 {
     float enemySpeed = 0.5f + (static_cast<float>(this->points) * 0.005f);
+    float lineEnemySpeed = 0.5f;
 
     this->spawnTimer += enemySpeed; // Use the adjusted enemySpeed
+    this->lineSpawnTimer += lineEnemySpeed; // Use the adjusted lineEnemySpeed
+
+    // Adjust these values based on your preferences
+    float lineEnemySpawnFrequency = 50.f; // Controls how often LineEnemies appear
+    float playerHpLossPercentage = 0.3f;   // Controls how much health the player loses when touching the line
+
     if (this->spawnTimer >= this->spawnTimerMax)
     {
         this->enemies.push_back(new Enemy(rand() % this->window->getSize().x - 20.f, -100.f, enemySpeed));
-        this->lineEnemies.push_back(new LineEnemy(rand() % this->window->getSize().x - 20.f, -100.f, sf::Color::Blue, 3.f, 1));
         this->spawnTimer = 0.f;
     }
 
+    if (this->lineSpawnTimer >= lineEnemySpawnFrequency)
+    {
+        this->lineEnemies.push_back(new LineEnemy(rand() % this->window->getSize().x - 20.f, -100.f, sf::Color::Blue, 3.f, 1));
+        this->lineSpawnTimer = 0.f;
+    }
 
     unsigned counter = 0;
     for (auto* enemy : this->enemies)
@@ -301,7 +277,6 @@ void Game::updateEnemies()
         {
             delete this->enemies.at(counter);
             this->enemies.erase(this->enemies.begin() + counter);
-
         }
         else if (enemy->getBounds().intersects(this->player->getBounds()))
         {
@@ -309,15 +284,34 @@ void Game::updateEnemies()
 
             delete this->enemies.at(counter);
             this->enemies.erase(this->enemies.begin() + counter);
-
         }
         ++counter;
     }
+
     for (auto* lineEnemy : this->lineEnemies)
     {
         lineEnemy->update();
+
+        // Collision between the player and the LineEnemy
+        if (lineEnemy->getBounds().intersects(this->player->getBounds()))
+        {
+            // The player has touched the LineEnemy, lose 30% of health
+            int currentHp = this->player->getHp();
+            int hpLoss = static_cast<int>(currentHp * playerHpLossPercentage);
+            this->player->setHp(currentHp - hpLoss);
+
+            // Delete the LineEnemy
+            auto it = std::find(this->lineEnemies.begin(), this->lineEnemies.end(), lineEnemy);
+            if (it != this->lineEnemies.end())
+            {
+                this->lineEnemies.erase(it);
+                delete lineEnemy;
+            }
+        }
     }
 }
+
+
 
 
 void Game::updateCombat()
@@ -347,6 +341,14 @@ void Game::updateCombat()
 
 void Game::update()
 {
+    sf::Time elapsed = clock.restart();
+
+    float deltaTime = elapsed.asSeconds();
+    totalElapsedTime += deltaTime;
+
+    this->gui1->UpdateinitguiPlayerPoints(this->points, totalElapsedTime);
+
+    std::cout << "Elapsed Time: " << deltaTime << std::endl;
 
     this->updateInput();
     this->player->update();
@@ -362,7 +364,6 @@ void Game::update()
 
 
     this->handleBonusCollision();
-    this->gui1->UpdateinitguiPlayerPoints(this->points);
     this->gui3->updateguiplayerHpBar(this->player->getHp(), this->player->getHpMax());
 
      for (auto* lineEnemy : this->lineEnemies)

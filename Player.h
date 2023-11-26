@@ -35,7 +35,7 @@ public:
     const bool canAttack();
     void updateAttack();
     void update();
-
+    void setMovementSpeed(const float speed);
     void render(sf::RenderTarget& target);
 };
 

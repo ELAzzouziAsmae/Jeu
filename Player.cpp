@@ -83,6 +83,7 @@ void Player::loseHp(const int value)
 
 void Player::move(const float dirX, const float dirY)
 {
+
     this->sprite.move(this->mouvementSpeed * dirX, this->mouvementSpeed * dirY);
 }
 
@@ -112,4 +113,8 @@ void Player::update()
 void Player::render(sf::RenderTarget& target)
 {
     target.draw(this->sprite);
+}
+void Player::setMovementSpeed(const float speed)
+{
+    this->mouvementSpeed = speed;
 }
