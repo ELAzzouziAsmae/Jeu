@@ -52,6 +52,7 @@ const int& Player::getHp() const
 {
     return this->hp;
 
+
 }
 
 const int& Player::getHpMax() const
