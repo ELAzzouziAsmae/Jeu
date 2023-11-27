@@ -15,4 +15,8 @@ public:
     void update();
     void render(sf::RenderTarget& target);
     const sf::FloatRect getBounds() const;
+    void setMovementSpeed(float newSpeed)
+    {
+        speed = newSpeed;
+    }
 };

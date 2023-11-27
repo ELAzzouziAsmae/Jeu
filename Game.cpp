@@ -15,7 +15,7 @@ void Game::initTextures()
 void Game::initPlayer()
 {
     this->player = new Player();
-    this->player->setMovementSpeed(3.0f);
+    this->player->setMovementSpeed(5.0f);
 }
 
 void Game::initGUID()
@@ -41,7 +41,6 @@ void Game::initEnemies()
     this->spawnTimer = this->spawnTimerMax;
     this->lineSpawnTimerMax = 200.f;
     this->lineSpawnTimer = this->lineSpawnTimerMax;
-    // Ajoutez les LineEnemy
     this->lineEnemies.push_back(new LineEnemy(rand() % this->window->getSize().x - 20.f,-100.f,sf::Color::Blue,3.f, 1.f ));
 }
 
@@ -108,9 +107,9 @@ void Game::run()
     while (this->window->isOpen())
     {
         this->updatePollEvents();
-       //
+       
         if (!this->gameManager.isPaused() && this->player->getHp() > 0)
-        //
+        
             this->update();
 
         this->render();
@@ -167,9 +166,9 @@ void Game::updateInput()
     {
         this->player->setPosition(0.f, this->player->getBounds().top);
     }
-    if (this->player->getBounds().top < 0.f)
+    if (this->player->getBounds().top < 100.f)
     {
-        this->player->setPosition(this->player->getBounds().left, 0.f);
+        this->player->setPosition(this->player->getBounds().left, 100.f);
     }
     if (this->player->getBounds().left > this->window->getSize().x - 100.f)
     {
@@ -183,7 +182,7 @@ void Game::updateInput()
 
 void Game::updateBullets()
 {
-    // Create a new vector to store bullets to be removed
+
     std::vector<Bullet*> bulletsToRemove;
 
     for (auto* bullet : this->bullets)
@@ -191,30 +190,27 @@ void Game::updateBullets()
         bullet->update();
         if (bullet->getBounds().top + bullet->getBounds().height < 0.f)
         {
-            // Instead of deleting and erasing in the loop, mark for removal
+
             bulletsToRemove.push_back(bullet);
         }
     }
 
-    // Remove the marked bullets from the original vector
     for (auto* bullet : bulletsToRemove)
     {
         auto it = std::find(this->bullets.begin(), this->bullets.end(), bullet);
         if (it != this->bullets.end())
         {
             this->bullets.erase(it);
-            delete bullet; // Delete the removed bullet
+            delete bullet; 
         }
     }
 
-    // Collision between bullets and LineEnemy
     for (auto* lineEnemy : this->lineEnemies)
     {
         for (auto* bullet : this->bullets)
         {
             if (lineEnemy->getBounds().intersects(bullet->getBounds()))
             {
-                // You may add any effects you want when a bullet hits LineEnemy, but no points or deletion
             }
         }
     }
@@ -244,18 +240,17 @@ void Game::renderWorld()
 {
     this->window->draw(this->worldBackground);
    
-}
-void Game::updateEnemies()
+}void Game::updateEnemies()
 {
     float enemySpeed = 0.5f + (static_cast<float>(this->points) * 0.005f);
-    float lineEnemySpeed = 0.5f;
+    float lineEnemySpeed = 0.5f + (static_cast<float>(this->points) * 0.002f);
 
-    this->spawnTimer += enemySpeed; // Use the adjusted enemySpeed
-    this->lineSpawnTimer += lineEnemySpeed; // Use the adjusted lineEnemySpeed
+    this->spawnTimer += enemySpeed;
+    this->lineSpawnTimer += lineEnemySpeed;
 
-    // Adjust these values based on your preferences
-    float lineEnemySpawnFrequency = 50.f; // Controls how often LineEnemies appear
-    float playerHpLossPercentage = 0.3f;   // Controls how much health the player loses when touching the line
+    float playerHpLossPercentage = 0.3f;
+
+    float lineEnemySpawnFrequency = 300.f; // Increase the frequency to reduce the appearance (adjust as needed)
 
     if (this->spawnTimer >= this->spawnTimerMax)
     {
@@ -292,15 +287,11 @@ void Game::updateEnemies()
     {
         lineEnemy->update();
 
-        // Collision between the player and the LineEnemy
         if (lineEnemy->getBounds().intersects(this->player->getBounds()))
         {
-            // The player has touched the LineEnemy, lose 30% of health
             int currentHp = this->player->getHp();
             int hpLoss = static_cast<int>(currentHp * playerHpLossPercentage);
             this->player->setHp(currentHp - hpLoss);
-
-            // Delete the LineEnemy
             auto it = std::find(this->lineEnemies.begin(), this->lineEnemies.end(), lineEnemy);
             if (it != this->lineEnemies.end())
             {
@@ -320,18 +311,18 @@ void Game::updateCombat()
         for (size_t k = 0; k < this->bullets.size(); k++) {
             if (this->enemies[i]->getBounds().intersects(this->bullets[k]->getBounds())) {
                 this->points += this->enemies[i]->getPoints();
-                                // Mark the enemy and bullet for deletion
+                                
                 delete this->enemies[i];
                 delete this->bullets[k];
 
-                // Remove the marked enemy and bullet
+                
                 this->enemies.erase(this->enemies.begin() + i);
                 this->bullets.erase(this->bullets.begin() + k);
 
-                // Decrement i and k to recheck the current index
+                
                 i--;
                 k--;
-                break; // Exit the inner loop since the bullet can only hit one enemy
+                break; 
             }
         }
     }
@@ -370,13 +361,10 @@ void Game::update()
      {
          lineEnemy->update();
 
-     // Collision entre le joueur et le LineEnemy
      if (lineEnemy->getBounds().intersects(this->player->getBounds()))
      {
-         // Le joueur a atteint le LineEnemy, ajoutez des points
          this->player->gainPoints(1);
 
-         // Supprimez le LineEnemy
          auto it = std::find(this->lineEnemies.begin(), this->lineEnemies.end(), lineEnemy);
          if (it != this->lineEnemies.end())
          {
@@ -428,7 +416,7 @@ void Game::initBonus()
     {
         std::cout << "Error: Failed to load bonus texture" << std::endl;
     }
-    bonusFrequency = 500; // Adjust as needed based on enemy speed
+    bonusFrequency = 500; 
     bonusTimer = 0;
 }
 
@@ -436,11 +424,11 @@ void Game::generateBonus()
 {
     if (player->getHp() < player->getHpMax() && bonusTimer >= bonusFrequency)
     {
-        float x = static_cast<float>(rand() % (window->getSize().x - 30)); // Adjust as needed
-        float y = static_cast<float>(-30); // Start above the screen
+        float x = static_cast<float>(rand() % (window->getSize().x - 30)); 
+        float y = static_cast<float>(-30); 
         Bonus* newBonus = new Bonus(x, y, bonusTexture);
         bonuses.push_back(newBonus);
-        bonusTimer = 0; // Reset the bonus timer
+        bonusTimer = 0; 
     }
 }
 
@@ -453,14 +441,12 @@ void Game::updateWorld()
 void Game::updateBonus()
 {
     bonusTimer++;
-    // Update all existing bonuses
     for (auto it = bonuses.begin(); it != bonuses.end();)
     {
         Bonus* bonus = *it;
-        bonus->move(0, 2.0f); // Move the bonus down, adjust the speed as needed
+        bonus->move(0, 2.0f); 
         if (bonus->getPosition().y > window->getSize().y)
         {
-            // Remove the bonus if it's below the screen
             delete bonus;
             it = bonuses.erase(it);
         }
@@ -473,13 +459,11 @@ void Game::updateBonus()
 
 void Game::handleBonusCollision()
 {
-    // Iterate through the bonuses to check for collisions with the player
     for (auto it = bonuses.begin(); it != bonuses.end();)
     {
         Bonus* bonus = *it;
         if (bonus->isTouched(player->getBounds()))
         {
-            // Apply the bonus effect (e.g., increase player's HP)
             this->player->setHp(this->player->getHp() + 10);
             delete bonus;
             it = bonuses.erase(it);
