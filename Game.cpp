@@ -250,7 +250,7 @@ void Game::renderWorld()
 
     float playerHpLossPercentage = 0.3f;
 
-    float lineEnemySpawnFrequency = 300.f; // Increase the frequency to reduce the appearance (adjust as needed)
+    float lineEnemySpawnFrequency = 300.f; 
 
     if (this->spawnTimer >= this->spawnTimerMax)
     {
