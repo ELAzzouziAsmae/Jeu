@@ -12,6 +12,9 @@ private:
     sf::Text poitText2;
 
 
+
+
+
 public:
     guiPlayerPoints();
     virtual ~guiPlayerPoints();
